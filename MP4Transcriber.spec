@@ -2,9 +2,9 @@
 
 
 a = Analysis(
-    ['MP4Transcriber.py'],
+    ['MP4Transcriber.pyw'],
     pathex=[],
-    binaries=[('E:\\IT\\Other\\Apps\\MP4 Transcriber\\ffmpeg.exe', 'ffmpeg.exe'), ('E:\\IT\\Other\\Apps\\MP4 Transcriber\\ffprobe.exe', 'ffprobe.exe')],
+    binaries=[('ffmpeg.exe', '.'), ('ffprobe.exe', '.')],
     datas=[],
     hiddenimports=[],
     hookspath=[],
@@ -29,7 +29,7 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

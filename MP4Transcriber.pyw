@@ -1,7 +1,11 @@
 from os import path, environ, remove
 from faster_whisper import WhisperModel
 import torch
+
 import ffmpegio
+base_dir = path.dirname(path.abspath(__file__))
+ffmpegio.set_path(ffmpeg_path=path.join(base_dir, "ffmpeg.exe"), ffprobe_path=path.join(base_dir, "ffprobe.exe"))
+
 from tkinter import filedialog
 from win11toast import notify
 from time import sleep
@@ -18,24 +22,24 @@ def get_tempdir():
 
 def extract_audio(input_path,output_path):
     notify("MP4 Transcriber","Beginning audio extraction...")
-    
+
+
     try:
-        ffmpegio.transcode(input_path, output_path, acodec='pcm_s16le', format='wav')
+        ffmpegio.transcode(input_path, output_path, overwrite=True, acodec='pcm_s16le', format='wav')
     except Exception as e:
-        notify("MP4 Transcriber",f"Error during audio extraction: {e}",duration=3)
-        remove(output_path)
-        sleep(3)
-        notify("MP4 Transcriber","Re-attempting audio extraction.",duration=1)
-        sleep(1)
+        notify("MP4 Transcriber",f"Error during audio extraction: {e}")
+        sleep(6)
+        notify("MP4 Transcriber","Re-attempting audio extraction.")
+        sleep(6)
         try:
-            ffmpegio.transcode(input_path, output_path, acodec='pcm_s16le', format='wav')
+            ffmpegio.transcode(input_path, output_path, overwrite=True, acodec='pcm_s16le', format='wav')
         except:
-            notify("MP4 Transcriber",f"Error occured during audio extraction, terminating.",duration=2)
+            notify("MP4 Transcriber",f"Error occured during audio extraction, terminating.")
             remove(output_path)
             exit()
 
     notify("MP4 Transcriber","Finished audio extraction.")
-
+    sleep(6)
 
 class STTProcessor:
     def __init__(self, model_size="medium"):
@@ -50,10 +54,12 @@ class STTProcessor:
     def transcribe(self, audio_file_path, language="en", task="translate", beam_size=5):
         if not self.model:
             notify("MP4 Transcriber","Model is not loaded.")
+            sleep(6)
             return None
 
         if not path.exists(audio_file_path):
             notify("MP4 Transcriber",f"Error: Audio file not found at {audio_file_path}")
+            sleep(6)
             return None
 
         notify("MP4 Transcriber","Transcribing audio...")
@@ -69,10 +75,10 @@ class STTProcessor:
             notify("MP4 Transcriber","Transcription complete!")
             return transcribed_text
         except Exception as e:
-            notify("MP4 Transcriber",f"Error during transcription: {e}",duration=4)
-            sleep(4)
-            notify("MP4 Transcriber","Re-attempting transcription.",duration=1)
-            sleep(1)
+            notify("MP4 Transcriber",f"Error during transcription: {e}")
+            sleep(6)
+            notify("MP4 Transcriber","Re-attempting transcription.")
+            sleep(6)
             try:
                 segments, info = self.model.transcribe(
                     audio_file_path,
@@ -94,7 +100,7 @@ class STTProcessor:
                 script.write(transcription)
             return
         else:
-            notify("MP4 Transcriber",f"Error occured during transcription, terminating.",duration=2)
+            notify("MP4 Transcriber",f"Error occured during transcription, terminating.")
             exit()
 
 
