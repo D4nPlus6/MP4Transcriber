@@ -111,11 +111,11 @@ parser.add_argument(
 # entrypoint
 if __name__ == '__main__':
     args = parser.parse_args()
-    openPath = parser.path if args.path else rf'./in.mp4' 
+    openPath = args.path if args.path else rf'./in.mp4' 
     tmp = path.join(get_tempdir(),(path.basename(openPath)[:-4]+'.wav'))
     extract_audio(openPath,tmp)
 
-    savePath = parser.output if args.output else rf'./out.txt'
+    savePath = args.output if args.output else rf'./out.txt'
     startTime = time()
     STTProcessor().transcribe_and_save(tmp,savePath)
     remove(tmp)
