@@ -1,11 +1,12 @@
 from os import path, environ, remove
+from time import time
 from faster_whisper import WhisperModel
 import torch
-
+import argparse
 import ffmpegio
-base_dir = path.dirname(path.abspath(__file__))
 
-from time import time
+# path setup
+base_dir = path.dirname(path.abspath(__file__))
 
 def get_tempdir():
     for var in ("TMPDIR", "TEMP", "TMP"):
@@ -15,7 +16,7 @@ def get_tempdir():
 
     return r"/tmp"
 
-
+# ffmpeg setup
 def extract_audio(input_path,output_path):
     print("[+] Beginning audio extraction...")
 
@@ -34,6 +35,7 @@ def extract_audio(input_path,output_path):
 
     print("[+] Finished audio extraction.")
 
+# faster whisper setup
 class STTProcessor:
     def __init__(self):
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -93,13 +95,27 @@ class STTProcessor:
             exit()
 
 
+# terminal args 
+parser = argparse.ArgumentParser()
 
+parser.add_argument(
+    "path",
+    help="specify path of file to transcribe"
+)
+
+parser.add_argument(
+    "-o", "--output",
+    help="specify path or name of output file"
+)
+
+# entrypoint
 if __name__ == '__main__':
-    openPath = rf'working/working.mp4'
+    args = parser.parse_args()
+    openPath = parser.path if args.path else rf'./in.mp4' 
     tmp = path.join(get_tempdir(),(path.basename(openPath)[:-4]+'.wav'))
     extract_audio(openPath,tmp)
 
-    savePath = rf'working/product.txt'
+    savePath = parser.output if args.output else rf'./out.txt'
     startTime = time()
     STTProcessor().transcribe_and_save(tmp,savePath)
     remove(tmp)
